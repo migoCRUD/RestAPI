@@ -4,14 +4,13 @@ from django.db import models
         
 class Usuario(models.Model):
     id_usuario = models.AutoField(primary_key=True)
-    rol_usuario = models.IntegerField()
+    rol_usuario = models.ForeignKey('RolUsuario')
     email = models.CharField(max_length=40)
     placa = models.CharField(max_length=8, null=True, blank=True)
     contrasena = models.CharField(max_length=10)
     fecha_creacion = models.DateField()
     fecha_modificacion = models.DateField()
     estado = models.IntegerField()
-    rol_usuario = models.ForeignKey('RolUsuario')
     
 
     def __str__(self):
