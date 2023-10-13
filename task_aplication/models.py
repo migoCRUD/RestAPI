@@ -4,13 +4,15 @@ from django.db import models
         
 class Usuario(models.Model):
     id_usuario = models.AutoField(primary_key=True)
-    estado = models.IntegerField()
+    rol_usuario = models.IntegerField()
     email = models.CharField(max_length=40)
     placa = models.CharField(max_length=8, null=True, blank=True)
     contrasena = models.CharField(max_length=10)
     fecha_creacion = models.DateField()
     fecha_modificacion = models.DateField()
-    rol_usuario = models.IntegerField()
+    estado = models.IntegerField()
+    rol_usuario = models.ForeignKey('RolUsuario')
+    
 
     def __str__(self):
         return self.nombre_usuario
@@ -30,8 +32,8 @@ class DetallePermisos(models.Model):
     id_opcion = models.IntegerField()
     accion_permitida = models.BooleanField()
     estado = models.IntegerField()
-    permisos = models.ForeignKey('PermisosXRol', on_delete=models.CASCADE)
-    opcion = models.ForeignKey('Opciones', on_delete=models.CASCADE)
+    id_permisos = models.ForeignKey('PermisosXRol', on_delete=models.CASCADE)
+    id_opcion = models.ForeignKey('Opciones', on_delete=models.CASCADE)
 
     def __str__(self):
         return f"Detalle de Permisos #{self.id}"
@@ -42,9 +44,9 @@ class PermisosXRol(models.Model):
     id_menu = models.IntegerField()
     id_vista = models.IntegerField()
     estado = models.IntegerField()
-    rol = models.ForeignKey('RolUsuario', on_delete=models.CASCADE)
-    menu = models.ForeignKey('Menu', on_delete=models.CASCADE)
-    vista = models.ForeignKey('Vista', on_delete=models.CASCADE)
+    id_rol = models.ForeignKey('RolUsuario')
+    id_menu = models.ForeignKey('Menu')
+    id_vista = models.ForeignKey('Vista')
 
     def __str__(self):
         return f"Permisos de Rol #{self.id_permisos}"
