@@ -23,9 +23,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-(v%6a73g)^q^2-)da$2(5fygrx8qx84cmel%c_htj%)flu2qq*'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['migoadvs.pythonanywhere.com']
 
 
 # Application definition
@@ -80,8 +80,12 @@ WSGI_APPLICATION = 'RestAPI.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'migoadvs_database',
+        'USER': 'administrador',
+        'PASSWORD': 'P$2wR8k#6q',
+        'HOST': 'migoadvs-3475.postgres.pythonanywhere-services.com',   # Set to your PostgreSQL server's host
+        'PORT': '13475',            # Leave empty for default PostgreSQL port (5432)
     }
 }
 
