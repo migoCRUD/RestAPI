@@ -29,9 +29,9 @@ class DetallePermisos(models.Model):
     id_permisos = models.IntegerField()
     id_opcion = models.IntegerField()
     accion_permitida = models.BooleanField()
-    estado = models.IntegerField()
     permisos = models.ForeignKey('PermisosXRol', on_delete=models.CASCADE)
     opcion = models.ForeignKey('Opciones', on_delete=models.CASCADE)
+    estado = models.IntegerField()
 
     def __str__(self):
         return f"Detalle de Permisos #{self.id}"
