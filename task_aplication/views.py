@@ -5,7 +5,7 @@ from rest_framework import viewsets
 from .models import (Usuario, RolUsuario, DetallePermisos, PermisosXRol, Publicista, EmpresaXPublicista,
 Empresa, Sector, Notificacion, Publicidad, Chofer, RecorridoRealizado, MarcasVehiculos,
 ModelosVehiculos, Vehiculo, Cliente, VerificacionConductorCampana, MovimientoCapital,
-IngresoConductorCampana, FormularioRegistroCampana, CampaniaPublicitaria,
+IngresoConductorCampana, FormularioRegistroCampana, CampanaPublicitaria,
 VehiculosAdmisiblesCampana, TallerXEmpresa, TallerBrandeo, Menu, Vista, Opciones)
 
 from .serializer import (UsuarioSerializer, RolUsuarioSerializer, DetallePermisosSerializer,
@@ -14,7 +14,7 @@ SectorSerializer, NotificacionSerializer, PublicidadSerializer, ChoferSerializer
 RecorridoRealizadoSerializer, MarcasVehiculosSerializer, ModelosVehiculosSerializer,
 VehiculoSerializer, ClienteSerializer, VerificacionConductorCampanaSerializer,
 MovimientoCapitalSerializer, IngresoConductorCampanaSerializer,
-FormularioRegistroCampanaSerializer, CampaniaPublicitariaSerializer,
+FormularioRegistroCampanaSerializer, CampanaPublicitariaSerializer,
 VehiculosAdmisiblesCampanaSerializer, TallerXEmpresaSerializer, TallerBrandeoSerializer,
 MenuSerializer, VistaSerializer, OpcionesSerializer)
 
@@ -92,17 +92,17 @@ class MovimientoCapitalViewSet(viewsets.ModelViewSet):
     queryset = MovimientoCapital.objects.all()
     serializer_class = MovimientoCapitalSerializer
 
-class IngresoConductorCampañaViewSet(viewsets.ModelViewSet):
+class IngresoConductorCampanaViewSet(viewsets.ModelViewSet):
     queryset = IngresoConductorCampana.objects.all()
     serializer_class = IngresoConductorCampanaSerializer
 
-class FormularioRegistroCampanñaViewSet(viewsets.ModelViewSet):
+class FormularioRegistroCampanaViewSet(viewsets.ModelViewSet):
     queryset = FormularioRegistroCampana.objects.all()
     serializer_class = FormularioRegistroCampanaSerializer
 
 class CampaniaPublicitariaViewSet(viewsets.ModelViewSet):
-    queryset = CampaniaPublicitaria.objects.all()
-    serializer_class = CampaniaPublicitariaSerializer
+    queryset = CampanaPublicitaria.objects.all()
+    serializer_class = CampanaPublicitariaSerializer
 
 class VehiculosAdmisiblesCampanaViewSet(viewsets.ModelViewSet):
     queryset = VehiculosAdmisiblesCampana.objects.all()

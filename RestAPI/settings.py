@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -23,9 +24,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-(v%6a73g)^q^2-)da$2(5fygrx8qx84cmel%c_htj%)flu2qq*'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['migoadvs.pythonanywhere.com']
 
 
 # Application definition
@@ -80,8 +81,12 @@ WSGI_APPLICATION = 'RestAPI.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'migoadvs_database',
+        'USER': 'administrador',
+        'PASSWORD': 'P$2wR8k#6q',
+        'HOST': 'migoadvs-3475.postgres.pythonanywhere-services.com',   # Set to your PostgreSQL server's host
+        'PORT': '13475',            # Leave empty for default PostgreSQL port (5432)
     }
 }
 
@@ -121,6 +126,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR,'static')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -130,6 +136,48 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 #autorizacion
 CORS_ALLOWED_ORIGINS=[]
 
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = True
+CORS_ORIGIN_WHITELIST = (
+    'http://localhost:3030',
+    'https://localhost:3030'
+)
+
+CORS_ORIGIN_REGEX_WHITELIST = (
+    'http://localhost:3030',
+    'https://localhost:3030'
+)
+
+CORS_ALLOW_METHODS = (
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+)
+
+CORS_ALLOW_HEADERS = (
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+)
+
 REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
 }
+
+# Enviar Emails
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp-mail.outlook.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
+EMAIL_HOST_USER = 'migoadstesting_@outlook.com'
+EMAIL_HOST_PASSWORD = 'testing123'
+

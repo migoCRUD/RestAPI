@@ -3,7 +3,7 @@ from .models import (
     Usuario, RolUsuario, DetallePermisos, PermisosXRol, Publicista, EmpresaXPublicista,
     Empresa, Sector, Notificacion, Publicidad, Chofer, RecorridoRealizado, MarcasVehiculos,
     ModelosVehiculos, Vehiculo, Cliente, VerificacionConductorCampana, MovimientoCapital,
-    IngresoConductorCampana, FormularioRegistroCampana, CampaniaPublicitaria,
+    IngresoConductorCampana, FormularioRegistroCampana, CampanaPublicitaria,
     VehiculosAdmisiblesCampana, TallerXEmpresa, TallerBrandeo, Menu, Vista, Opciones)
 
 
@@ -29,7 +29,7 @@ admin.site.register(VerificacionConductorCampana)
 admin.site.register(MovimientoCapital)
 admin.site.register(IngresoConductorCampana)
 admin.site.register(FormularioRegistroCampana)
-admin.site.register(CampaniaPublicitaria)
+admin.site.register(CampanaPublicitaria)
 admin.site.register(VehiculosAdmisiblesCampana)
 admin.site.register(TallerXEmpresa)
 admin.site.register(TallerBrandeo)

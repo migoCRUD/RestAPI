@@ -2,7 +2,7 @@ from rest_framework import serializers
 from .models import (Usuario, RolUsuario, DetallePermisos, PermisosXRol, Publicista, EmpresaXPublicista,
 Empresa, Sector, Notificacion, Publicidad, Chofer, RecorridoRealizado, MarcasVehiculos,
 ModelosVehiculos, Vehiculo, Cliente, VerificacionConductorCampana, MovimientoCapital,
-IngresoConductorCampana, FormularioRegistroCampana, CampaniaPublicitaria,
+IngresoConductorCampana, FormularioRegistroCampana, CampanaPublicitaria,
 VehiculosAdmisiblesCampana, TallerXEmpresa, TallerBrandeo, Menu, Vista, Opciones)
 
 class UsuarioSerializer(serializers.ModelSerializer):
@@ -105,9 +105,9 @@ class FormularioRegistroCampanaSerializer(serializers.ModelSerializer):
         model = FormularioRegistroCampana
         fields = '__all__'
 
-class CampaniaPublicitariaSerializer(serializers.ModelSerializer):
+class CampanaPublicitariaSerializer(serializers.ModelSerializer):
     class Meta:
-        model = CampaniaPublicitaria
+        model = CampanaPublicitaria
         fields = '__all__'
 
 class VehiculosAdmisiblesCampanaSerializer(serializers.ModelSerializer):
