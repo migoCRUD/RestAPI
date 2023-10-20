@@ -5,6 +5,12 @@ ModelosVehiculos, Vehiculo, Cliente, VerificacionConductorCampana, MovimientoCap
 IngresoConductorCampana, FormularioRegistroCampana, CampanaPublicitaria,
 VehiculosAdmisiblesCampana, TallerXEmpresa, TallerBrandeo, Menu, Vista, Opciones)
 
+class EmailSerializer(serializers.Serializer):
+    subject = serializers.CharField()
+    message = serializers.CharField()
+    from_email = serializers.EmailField()
+    recipient_list = serializers.ListField(child=serializers.EmailField())
+
 class UsuarioSerializer(serializers.ModelSerializer):
     class Meta:
         model = Usuario

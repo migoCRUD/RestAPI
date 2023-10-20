@@ -174,10 +174,10 @@ REST_FRAMEWORK = {
 
 # Enviar Emails
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp-mail.outlook.com'
+EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
-EMAIL_HOST_USER = 'migoadstesting_@outlook.com'
-EMAIL_HOST_PASSWORD = 'testing123'
+EMAIL_HOST_USER = 'migoadvstesting@gmail.com'
+EMAIL_HOST_PASSWORD = 'phlg vfft gmwu ggqt'
 

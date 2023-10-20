@@ -1,4 +1,11 @@
 from django.shortcuts import render
+from django.conf import settings
+from django.core.mail import EmailMessage
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from .serializer import EmailSerializer
+
 
 # Create your views here.
 from rest_framework import viewsets
@@ -19,6 +26,13 @@ VehiculosAdmisiblesCampanaSerializer, TallerXEmpresaSerializer, TallerBrandeoSer
 MenuSerializer, VistaSerializer, OpcionesSerializer)
 
 # Vistas para cada modelo
+
+class SendEmailView(APIView):
+    def get(self, request, subject, message, from_email, recipient_list):
+        email = EmailMessage(subject, message, from_email, recipient_list.split(','))
+        email.send()
+
+        return Response({'message': 'Email sent successfully.'}, status=status.HTTP_200_OK)
 
 class UsuarioViewSet(viewsets.ModelViewSet):
     queryset = Usuario.objects.all()

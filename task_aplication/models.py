@@ -22,7 +22,7 @@ class Usuario(models.Model):
     estado = models.IntegerField()
 
     def __str__(self):
-        return self.id_usuario
+        return self.email
 
 class DetallePermisos(models.Model):
     id = models.AutoField(primary_key=True)
@@ -84,7 +84,7 @@ class Empresa(models.Model):
     estado = models.IntegerField()
 
     def __str__(self):
-        return self.id_empresa
+        return self.nombre
 
 class Sector(models.Model):
     id_sector = models.AutoField(primary_key=True)
@@ -96,7 +96,7 @@ class Sector(models.Model):
     estado = models.IntegerField()
 
     def __str__(self):
-        return self.id_sector
+        return self.nombre
 
 class Notificacion(models.Model):
     id_notificacion = models.AutoField(primary_key=True)
@@ -111,7 +111,7 @@ class Notificacion(models.Model):
     fecha_modificacion = models.DateField()
 
     def __str__(self):
-        return self.id_notificacion
+        return self.titulo
 
 class Publicidad(models.Model):
     id_publicidad = models.AutoField(primary_key=True)
@@ -121,7 +121,7 @@ class Publicidad(models.Model):
     fecha_modificacion = models.DateField()
 
     def __str__(self):
-        return self.id_publicidad
+        return f"Publicidad #{self.id_publicidad}"
 
 class Chofer(models.Model):
     id_usuario = models.ForeignKey('Usuario', on_delete=models.CASCADE)
@@ -131,6 +131,7 @@ class Chofer(models.Model):
     apellido = models.CharField(max_length=20)
     fecha_nacimiento = models.DateField()
     sexo = models.IntegerField()
+    estado = models.IntegerField()
 
     def __str__(self):
         return f"{self.nombre} {self.apellido}"
@@ -145,6 +146,7 @@ class RecorridoRealizado(models.Model):
     hora_fin = models.DateTimeField()
     kilometraje_recorrido = models.IntegerField()
     dinero_recaudado = models.FloatField()
+    estado = models.IntegerField()
 
     def __str__(self):
         return f"Recorrido #{self.id_recorrido}"
@@ -179,6 +181,7 @@ class Vehiculo(models.Model):
     imagen_frontal = models.FileField()
     imagen_trasera = models.FileField()
     imagen_techo = models.FileField()
+    estado = models.IntegerField()
 
     def __str__(self):
         return self.placa
@@ -194,6 +197,7 @@ class Cliente(models.Model):
     telefono = models.CharField(max_length=10)
     id_empresa = models.ForeignKey('Empresa', on_delete=models.CASCADE, null=True, blank=True)
     id_campana = models.ForeignKey('CampanaPublicitaria', on_delete=models.CASCADE, null=True, blank=True)
+    estado = models.IntegerField()
 
     def __str__(self):
         return f"{self.nombre} {self.apellido}"
@@ -206,6 +210,7 @@ class VerificacionConductorCampana(models.Model):
     fecha_registro = models.DateField()
     tipo_verificacion = models.CharField(max_length=20)
     imagen_evidencia = models.FileField()
+    estado = models.IntegerField()
 
     def __str__(self):
         return f"Verificación #{self.id_verificacion}"
@@ -219,6 +224,7 @@ class MovimientoCapital(models.Model):
     fecha_transaccion = models.DateField()
     monto_transaccion = models.FloatField()
     saldo_acumulado = models.FloatField()
+    estado = models.IntegerField()
 
     def __str__(self):
         return f"Transacción de Capital #{self.id_saldo}"
@@ -271,9 +277,10 @@ class CampanaPublicitaria(models.Model):
     carroceria_techo = models.BooleanField()
     fecha_creacion = models.DateField()
     fecha_modificacion = models.DateField()
+    estado = models.IntegerField()
 
     def __str__(self):
-        return self.id_campana
+        return self.nombre_campana
 
 class VehiculosAdmisiblesCampana(models.Model):
     id_vehiculo = models.ForeignKey('Vehiculo', on_delete=models.CASCADE)
