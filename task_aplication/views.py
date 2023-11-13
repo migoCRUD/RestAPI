@@ -5,6 +5,9 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .serializer import EmailSerializer
+from django.conf import settings
+from django.template.loader import render_to_string
+
 
 
 # Create your views here.
@@ -28,11 +31,34 @@ MenuSerializer, VistaSerializer, OpcionesSerializer)
 # Vistas para cada modelo
 
 class SendEmailView(APIView):
-    def get(self, request, subject, message, from_email, recipient_list):
-        email = EmailMessage(subject, message, from_email, recipient_list.split(','))
-        email.send()
+    def post(self, request):
+        serializer = EmailSerializer(data=request.data)
 
-        return Response({'message': 'Email sent successfully.'}, status=status.HTTP_200_OK)
+        if serializer.is_valid():
+            message = serializer.validated_data['message']
+            subject = serializer.validated_data['subject']
+            from_email = settings.EMAIL_HOST_USER
+            recipient_list = serializer.validated_data['recipient_list']
+
+            #code = str(rd.randint(111111, 999999))
+            #message = "El código para recuperar su contraseña es "+code
+            #subject = "Migo Ads - Recuperación de contraseña"
+
+            context = {
+                'name': subject,
+                'code': message
+            }
+
+            # Render the HTML template
+            html_content = render_to_string('correo.html', context)
+
+            email = EmailMessage("Migo Ads - Recuperación de contraseña", html_content, from_email, recipient_list)
+            email.content_subtype = "html"
+            email.send()
+
+            return Response({'message': 'Email sent successfully.'}, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class UsuarioViewSet(viewsets.ModelViewSet):
     queryset = Usuario.objects.all()

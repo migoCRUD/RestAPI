@@ -40,6 +40,6 @@ router.register(r'opciones', views.OpcionesViewSet)
 urlpatterns=[
     path("Database/", include(router.urls)),
     path('documents/', include_docs_urls(title='Aplication API')),
-    path('send_email/<str:subject>/<str:message>/<str:from_email>/<str:recipient_list>/', views.SendEmailView.as_view(), name='send_email')
+    path('send_email/', views.SendEmailView.as_view(), name='send_email')
     ]
 # se genera el CRUD

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+{% load static %}
+<html>
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="{% static 'correo.css' %}">
+    <title>Email Template</title>
+  </head>
+  <header>
+    <div class="topImg">
+      <img src="{% static 'icon01.png' %}" alt="">
+    </div>
+    <div class="titulo">
+      <table>
+        <tr>
+          <td>
+            <img src="{% static 'icon02.png' %}" alt="">
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <h2> Necesitas recuperar tu contraseña? </h2>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </header>
+  <body>
+    <div class="content">
+      <p>
+        Hola, {{ name }} <br> <br> <br>
+
+        Le hemos enviado este correo electronico
+        en respuesta a su solicitud para restablecer
+        su contraseña. <br> <br> <br>
+        Para restablecer su contraseña, Usa el siguiente
+        código único en la aplicación.
+      </p>
+      <table>
+        <tr>
+          <td>
+            <h3> {{ code }} </h3>
+          </td>
+        </tr>
+      </table>
+      <p class="ignorar">Si no solicitaste restablecer
+        tu contraseña puedes ignorar este correo</p>
+    </div>
+    <div class="footer">
+      <p>Descarga nuestra App: </p>
+      <img src="{% static 'tiendas.png' %}" alt="">
+    </div>
+    <div class="content"></div>
+  </body>
+</html>

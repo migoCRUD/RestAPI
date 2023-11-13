@@ -1,0 +1,50 @@
+header {
+    background-color: rgb(43, 43, 43);
+}
+
+.content {
+    background-color: rgb(234, 226, 226);
+    padding-top: 3%;
+    padding-bottom: 2%;
+    padding-left: 7%;
+    padding-right: 7%;
+
+    
+}
+
+.topImg {
+    background-color: white;
+    display: flex;
+    justify-content: center;
+}
+
+.titulo {
+    color: white;
+    display: flex;
+    justify-content: center;
+}
+
+.footer {
+    display: flex;
+    background-color: yellow;
+    justify-content: space-evenly;
+    font-style: italic;
+}
+
+.ignorar {
+    font-style: italic;
+}
+
+.footer img {
+    width: auto;
+    height: 50px;
+}
+
+td {
+    text-align: center;
+}
+
+h3{
+    background-color: rgb(223, 174, 14);
+    color: white;
+}

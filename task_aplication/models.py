@@ -21,8 +21,8 @@ class Usuario(models.Model):
     fecha_modificacion = models.DateField()
     estado = models.IntegerField()
 
-    def __str__(self):
-        return self.email
+    def __int__(self):
+        return self.id_usuario
 
 class DetallePermisos(models.Model):
     id = models.AutoField(primary_key=True)

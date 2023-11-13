@@ -60,7 +60,7 @@ ROOT_URLCONF = 'RestAPI.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR/"templates"],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -125,7 +125,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR,'static')
 
 # Default primary key field type
@@ -140,7 +140,8 @@ CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_WHITELIST = (
     'http://localhost:3030',
-    'https://localhost:3030'
+    'https://localhost:3030',
+    'http://localhost:4200'
 )
 
 CORS_ORIGIN_REGEX_WHITELIST = (
@@ -173,11 +174,22 @@ REST_FRAMEWORK = {
 }
 
 # Enviar Emails
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'mail.hangaroa.ec'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
+EMAIL_HOST_USER = 'migo@hangaroa.ec'
+EMAIL_HOST_PASSWORD = 'Migo2023*'
+'''
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_USE_SSL = False
 EMAIL_HOST_USER = 'migoadvstesting@gmail.com'
-EMAIL_HOST_PASSWORD = 'phlg vfft gmwu ggqt'
+EMAIL_HOST_PASSWORD = 'P$2wR8k#6q'
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+'''
+
 
