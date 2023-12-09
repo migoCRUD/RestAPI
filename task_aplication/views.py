@@ -26,7 +26,7 @@ VehiculoSerializer, ClienteSerializer, VerificacionConductorCampanaSerializer,
 MovimientoCapitalSerializer, IngresoConductorCampanaSerializer,
 FormularioRegistroCampanaSerializer, CampanaPublicitariaSerializer,
 VehiculosAdmisiblesCampanaSerializer, TallerXEmpresaSerializer, TallerBrandeoSerializer,
-MenuSerializer, VistaSerializer, OpcionesSerializer)
+MenuSerializer, VistaSerializer, OpcionesSerializer,SectoresSerializer,EmpresasSerializer)
 
 # Vistas para cada modelo
 
@@ -167,3 +167,62 @@ class VistaViewSet(viewsets.ModelViewSet):
 class OpcionesViewSet(viewsets.ModelViewSet):
     queryset = Opciones.objects.all()
     serializer_class = OpcionesSerializer
+
+class SectoresPorUsuarioView(APIView):
+    def get(self, request, usuario_id):
+        try:
+            # Obtener el rol del usuario
+            usuario = Usuario.objects.get(id_usuario=usuario_id)
+            id_rol = usuario.rol_usuario.id_rol_usuario
+
+            # Obtener sectores para un usuario específico
+            if id_rol == 1:  # 1 para administrador
+                sectores = Sector.objects.all().distinct()
+            elif id_rol == 2:  # 2 para publicista
+                publicista = Publicista.objects.get(id_usuario=usuario)
+                empresas_asociadas = EmpresaXPublicista.objects.filter(
+                    id_publicista=publicista
+                ).values_list("id_empresa", flat=True)
+                sectores = Sector.objects.filter(id_empresa__in=empresas_asociadas).distinct()
+            elif id_rol == 3:  # 3 para empresa
+                empresa = Empresa.objects.get(id_usuario=usuario)
+                sectores = Sector.objects.filter(id_empresa=empresa).distinct()
+            else:
+                return Response({"error": "Tipo de usuario no válido"}, status=status.HTTP_400_BAD_REQUEST)
+
+            #serialización
+            serializer = SectoresSerializer(sectores, many=True)
+
+            return Response(serializer.data)
+        except Usuario.DoesNotExist:
+            return Response({"error": "Usuario no encontrado"}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class EmpresasListView(APIView):
+    def get(self, request, usuario_id):
+        try:
+            # Obtener el rol del usuario
+            usuario = Usuario.objects.get(id_usuario=usuario_id)
+            id_rol = usuario.rol_usuario.id_rol_usuario
+
+            # Obtener la lista de empresas según el tipo de usuario
+            if id_rol == 1:  # Administrador
+                empresas = Empresa.objects.filter(id_usuario_administrador=usuario_id)
+            elif id_rol == 2:  # Publicista
+                publicista = Publicista.objects.get(id_usuario=usuario)
+                empresas_asociadas = EmpresaXPublicista.objects.filter(
+                    id_publicista=publicista
+                ).values_list("id_empresa", flat=True)
+                empresas = Empresa.objects.filter(id_empresa__in=empresas_asociadas)
+            else:
+                return Response({"error": "Tipo de usuario no válido"}, status=status.HTTP_400_BAD_REQUEST)
+
+            #serialización
+            serializer = EmpresasSerializer(empresas, many=True)
+
+            return Response(serializer.data)
+        except Usuario.DoesNotExist:
+            return Response({"error": "Usuario no encontrado"}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

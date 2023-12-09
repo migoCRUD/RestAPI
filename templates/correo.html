@@ -1,24 +1,30 @@
 <!DOCTYPE html>
-{% load static %}
 <html>
   <head>
     <meta charset="utf-8">
-    <link rel="stylesheet" href="{% static 'correo.css' %}">
+    <link rel="stylesheet" href="https://raw.githubusercontent.com/rexman10/VacationPackage/main/iconos_correo/correo.css">
     <title>Email Template</title>
   </head>
-  <header>
-    <div class="topImg">
-      <img src="{% static 'icon01.png' %}" alt="">
+  <header style="background-color: rgb(43, 43, 43);">
+    <div class="topImg" style=" background-color: white;
+                                display: flex;
+                                justify-content: center;"
+    >
+      <img src="https://raw.githubusercontent.com/rexman10/VacationPackage/main/iconos_correo/icon01.png" alt="logo migo">
     </div>
-    <div class="titulo">
+    <div class="titulo" style=" color: white;
+                                background-color: rgb(43, 43, 43);
+                                display: flex;
+                                justify-content: center;"
+    >
       <table>
         <tr>
-          <td>
-            <img src="{% static 'icon02.png' %}" alt="">
+          <td style="text-align: center;">
+            <img src="https://raw.githubusercontent.com/rexman10/VacationPackage/main/iconos_correo/icon02.png" alt="candado">
           </td>
         </tr>
         <tr>
-          <td>
+          <td style="text-align: center;">
             <h2> Necesitas recuperar tu contraseña? </h2>
           </td>
         </tr>
@@ -26,7 +32,12 @@
     </div>
   </header>
   <body>
-    <div class="content">
+    <div class="content" style="background-color: rgb(234, 226, 226);
+                                padding-top: 3%;
+                                padding-bottom: 2%;
+                                padding-left: 7%;
+                                padding-right: 7%;"
+    >
       <p>
         Hola, {{ name }} <br> <br> <br>
 
@@ -39,16 +50,20 @@
       <table>
         <tr>
           <td>
-            <h3> {{ code }} </h3>
+            <h3 style="background-color: rgb(223, 174, 14); color: white;"> {{ code }} </h3>
           </td>
         </tr>
       </table>
-      <p class="ignorar">Si no solicitaste restablecer
+      <p class="ignorar" style="font-style: italic;">Si no solicitaste restablecer
         tu contraseña puedes ignorar este correo</p>
     </div>
-    <div class="footer">
+    <div class="footer" style=" display: flex;
+                                background-color: yellow;
+                                justify-content: space-evenly;
+                                font-style: italic;"
+    >
       <p>Descarga nuestra App: </p>
-      <img src="{% static 'tiendas.png' %}" alt="">
+      <img src="https://raw.githubusercontent.com/rexman10/VacationPackage/main/iconos_correo/tiendas.png" style="width: auto; height: 50px;" alt="tiendas">
     </div>
     <div class="content"></div>
   </body>

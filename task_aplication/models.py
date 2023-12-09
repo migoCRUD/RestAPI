@@ -21,8 +21,8 @@ class Usuario(models.Model):
     fecha_modificacion = models.DateField()
     estado = models.IntegerField()
 
-    def __int__(self):
-        return self.id_usuario
+    def __str__(self):
+        return self.email
 
 class DetallePermisos(models.Model):
     id = models.AutoField(primary_key=True)
@@ -51,6 +51,7 @@ class PermisosXRol(models.Model):
 
 class Publicista(models.Model):
     id_publicista = models.AutoField(primary_key=True)
+    id_usuario = models.ForeignKey('Usuario', on_delete=models.CASCADE)
     ruc = models.CharField(max_length=13)
     nombre = models.CharField(max_length=30)
     mail_contacto = models.CharField(max_length=40)
@@ -74,6 +75,7 @@ class EmpresaXPublicista(models.Model):
 
 class Empresa(models.Model):
     id_empresa = models.AutoField(primary_key=True)
+    id_usuario = models.ForeignKey('Usuario', on_delete=models.CASCADE)
     ruc = models.CharField(max_length=13)
     nombre = models.CharField(max_length=30)
     descripcion = models.CharField(max_length=50)
@@ -89,7 +91,7 @@ class Empresa(models.Model):
 class Sector(models.Model):
     id_sector = models.AutoField(primary_key=True)
     id_empresa = models.ForeignKey('Empresa', on_delete=models.CASCADE)
-    nombre = models.CharField(max_length=15)
+    nombre = models.CharField(max_length=100)
     fecha_creacion = models.DateField()
     cerco_virtual = models.JSONField()
     fecha_modificacion = models.DateField()
@@ -188,6 +190,7 @@ class Vehiculo(models.Model):
 
 class Cliente(models.Model):
     id_cliente = models.AutoField(primary_key=True)
+    id_usuario = models.ForeignKey('Usuario', on_delete=models.CASCADE)
     cedula_cliente = models.CharField(max_length=10)
     nombre = models.CharField(max_length=20)
     apellido = models.CharField(max_length=20)

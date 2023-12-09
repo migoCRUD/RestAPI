@@ -145,3 +145,13 @@ class OpcionesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Opciones
         fields = '__all__'
+
+class SectoresSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Sector
+        fields = '__all__'
+
+class EmpresasSerializer(serializers.Serializer):
+    class Meta:
+        model = Empresa
+        fields = ['id_empresa', 'nombre_empresa']
