@@ -293,6 +293,10 @@ class CampanaPublicitaria(models.Model):
     fecha_modificacion = models.DateField()
     estado = models.IntegerField()
     sedan_admisible = models.BooleanField()
+    suv_admisible = models.BooleanField()
+    camion_admisible = models.BooleanField()
+    camioneta_admisible = models.BooleanField()
+    bus_admisible = models.BooleanField()
 
     def __str__(self):
         return self.nombre_campana
