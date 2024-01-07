@@ -1,4 +1,6 @@
 from django.db import models
+# django.contrib.auth.hashers import make_password
+
 
 # Create your models here.
 
@@ -14,15 +16,23 @@ class RolUsuario(models.Model):
 class Usuario(models.Model):
     id_usuario = models.AutoField(primary_key=True)
     rol_usuario = models.ForeignKey(RolUsuario, on_delete=models.CASCADE)
-    email = models.CharField(max_length=40)
+    email = models.EmailField(unique=True)
     placa = models.CharField(max_length=8, null=True, blank=True)
-    contrasena = models.CharField(max_length=10)
-    fecha_creacion = models.DateField()
-    fecha_modificacion = models.DateField()
-    estado = models.IntegerField()
+    contrasena = models.CharField(max_length=128)  # Longitud suficiente para almacenar el hash
+    fecha_creacion = models.DateField(auto_now_add=True)
+    fecha_modificacion = models.DateField(auto_now=True)
+    estado = models.IntegerField(choices=[(0, 'Inactivo'), (1, 'Activo'), (3, 'deshabilitado')], default=0)
+
+    #def save(self, *args, **kwargs):
+        # Almacena la contraseña como un hash solo si se está creando un nuevo objeto
+     #   if not self.id_usuario:
+      #      self.contrasena = make_password(self.contrasena)
+       # super().save(*args, **kwargs)
 
     def __str__(self):
         return self.email
+
+
 
 class DetallePermisos(models.Model):
     id = models.AutoField(primary_key=True)
@@ -248,8 +258,8 @@ class FormularioRegistroCampana(models.Model):
     id_cliente = models.ForeignKey('Cliente', on_delete=models.CASCADE)
     id_campana = models.ForeignKey('CampanaPublicitaria', on_delete=models.CASCADE)
     telefono_conductor = models.IntegerField()
-    licencia = models.FileField()
-    matricula = models.FileField()
+    licencia = models.ImageField(upload_to='images/')
+    matricula = models.ImageField(upload_to='images/')
     numero_cuenta_bancaria = models.CharField(max_length=15)
     cedula = models.CharField(max_length=10)
     entidad_bancaria = models.IntegerField()
@@ -264,6 +274,7 @@ class CampanaPublicitaria(models.Model):
     id_campana = models.AutoField(primary_key=True)
     id_empresa = models.ForeignKey('Empresa', on_delete=models.CASCADE)
     nombre_campana = models.CharField(max_length=20)
+    id_sector = models.IntegerField(null=True)
     fecha_inicio = models.DateField()
     fecha_fin = models.DateField()
     fecha_fin_registro = models.DateField()
@@ -281,6 +292,7 @@ class CampanaPublicitaria(models.Model):
     fecha_creacion = models.DateField()
     fecha_modificacion = models.DateField()
     estado = models.IntegerField()
+    sedan_admisible = models.BooleanField()
 
     def __str__(self):
         return self.nombre_campana

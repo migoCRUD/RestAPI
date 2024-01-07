@@ -1,9 +1,12 @@
 from rest_framework import serializers
+#from rest_framework_simplejwt.tokens import RefreshToken
+#from django.contrib.auth.hashers import check_password
 from .models import (Usuario, RolUsuario, DetallePermisos, PermisosXRol, Publicista, EmpresaXPublicista,
 Empresa, Sector, Notificacion, Publicidad, Chofer, RecorridoRealizado, MarcasVehiculos,
 ModelosVehiculos, Vehiculo, Cliente, VerificacionConductorCampana, MovimientoCapital,
 IngresoConductorCampana, FormularioRegistroCampana, CampanaPublicitaria,
 VehiculosAdmisiblesCampana, TallerXEmpresa, TallerBrandeo, Menu, Vista, Opciones)
+
 
 class EmailSerializer(serializers.Serializer):
     subject = serializers.CharField()
@@ -15,6 +18,7 @@ class UsuarioSerializer(serializers.ModelSerializer):
     class Meta:
         model = Usuario
         fields = '__all__'
+
 
 class RolUsuarioSerializer(serializers.ModelSerializer):
     class Meta:

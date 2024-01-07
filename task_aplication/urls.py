@@ -2,8 +2,6 @@ from django.urls import path , include
 from rest_framework.documentation import include_docs_urls
 from rest_framework import routers
 from task_aplication import views
-
-
 router = routers.DefaultRouter()
 #router.register(r"Usuarios",views.aplicationView,'Usuario')
 
@@ -41,6 +39,7 @@ urlpatterns=[
     path("Database/", include(router.urls)),
     path('documents/', include_docs_urls(title='Aplication API')),
     path('send_email/', views.SendEmailView.as_view(), name='send_email'),
+
     path('sectores_por_usuario/<int:usuario_id>/', views.SectoresPorUsuarioView.as_view(), name='sectores-por-usuario'),
     path('empresas_list/<int:usuario_id>/', views.EmpresasListView.as_view(), name='empresas-list'),
     ]
