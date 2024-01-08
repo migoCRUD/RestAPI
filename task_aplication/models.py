@@ -186,8 +186,15 @@ class Vehiculo(models.Model):
     id_marca = models.ForeignKey('MarcasVehiculos', on_delete=models.CASCADE)
     id_modelo = models.ForeignKey('ModelosVehiculos', on_delete=models.CASCADE)
     anio = models.IntegerField()
+    TIPOS_DE_AUTOS = [
+        ('sedan', 'Sedan'),
+        ('suv', 'SUV'),
+        ('camioneta', 'Camioneta'),
+        ('camion', 'Camion'),
+        ('bus', 'Bus'),
+    ]
     categoria_vehiculo = models.IntegerField()
-    color_vehiculo = models.IntegerField()
+    color_vehiculo = models.CharField(max_length=20)
     imagen_izq = models.FileField()
     imagen_der = models.FileField()
     imagen_frontal = models.FileField()
