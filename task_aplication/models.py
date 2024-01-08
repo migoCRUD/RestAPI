@@ -193,7 +193,7 @@ class Vehiculo(models.Model):
         ('camion', 'Camion'),
         ('bus', 'Bus'),
     ]
-    categoria_vehiculo = models.IntegerField()
+    categoria_vehiculo = models.CharField(max_length=20, choices=TIPOS_DE_AUTOS)
     color_vehiculo = models.CharField(max_length=20)
     imagen_izq = models.FileField()
     imagen_der = models.FileField()
