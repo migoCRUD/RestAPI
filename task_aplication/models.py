@@ -281,6 +281,7 @@ class CampanaPublicitaria(models.Model):
     id_campana = models.AutoField(primary_key=True)
     id_empresa = models.ForeignKey('Empresa', on_delete=models.CASCADE)
     nombre_campana = models.CharField(max_length=20)
+    correo_responsable = models.CharField(max_length=40)
     id_sector = models.IntegerField(null=True)
     fecha_inicio = models.DateField()
     fecha_fin = models.DateField()
@@ -288,7 +289,17 @@ class CampanaPublicitaria(models.Model):
     presupuesto = models.FloatField()
     nombre_responsable = models.CharField(max_length=20)
     tarifa_base = models.FloatField()
-    taller_brandeo = models.CharField(max_length=20)
+    tarifa_min = models.FloatField()
+    tarifa_max = models.FloatField()
+    hora_monetizable_inicio = models.CharField(max_length=5)
+    hora_monetizable_fin = models.CharField(max_length=5)
+    cobro_minimo = models.FloatField()
+    TIPOS_BRANDEOS = [
+        ('sticker', 'Sticker'),
+        ('panel led', 'Panel LED'),
+    ]
+    tipo_brandeo = models.CharField(max_length=20, choices=TIPOS_BRANDEOS)
+    taller_brandeo = models.CharField(max_length=30)
     carroceria_capo = models.BooleanField()
     puerta_conductor = models.BooleanField()
     puerta_pasajero = models.BooleanField()
