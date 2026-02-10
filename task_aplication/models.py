@@ -1,8 +1,47 @@
 from django.db import models
-# django.contrib.auth.hashers import make_password
+import hashlib
 
+MEDIA_URL = 'media/'
+EVIDENCE_URL = 'evidences/'
+DOCS_URL = 'documents/'
+ADS_URL = 'ads/'
+NOTIF_URL = 'notifications/'
+LOGOS_URL = 'empresas/logos/'
+BANNERS_URL = 'empresas/banners/'
 
 # Create your models here.
+
+class Estado(models.Model):
+    id_estado = models.IntegerField(default=0)
+    nombre = models.CharField(max_length=30)
+
+    def __str__(self):
+        return self.nombre
+
+class Pais(models.Model):
+    id_pais = models.AutoField(primary_key=True)
+    nombre = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.nombre
+
+class Ciudad(models.Model):
+    id_ciudad = models.AutoField(primary_key=True)
+    id_pais = models.ForeignKey(Pais, on_delete=models.CASCADE)
+    nombre = models.CharField(max_length=80)
+    ubicacion_google_maps = models.JSONField(default=dict)
+
+    def __str__(self):
+        return self.nombre
+
+class EntidadBancaria(models.Model):
+    id_entidad = models.AutoField(primary_key=True)
+    id_ciudad = models.ForeignKey(Ciudad, on_delete=models.CASCADE, default=1)
+    id_pais = models.ForeignKey(Pais, on_delete=models.CASCADE, default=1)
+    nombre = models.CharField(max_length=200)
+
+    def __str__(self):
+        return self.nombre
 
 class RolUsuario(models.Model):
     id_rol_usuario = models.AutoField(primary_key=True)
@@ -16,18 +55,27 @@ class RolUsuario(models.Model):
 class Usuario(models.Model):
     id_usuario = models.AutoField(primary_key=True)
     rol_usuario = models.ForeignKey(RolUsuario, on_delete=models.CASCADE)
-    email = models.EmailField(unique=True)
+    email = models.CharField(max_length=50)
     placa = models.CharField(max_length=8, null=True, blank=True)
-    contrasena = models.CharField(max_length=128)  # Longitud suficiente para almacenar el hash
+    contrasena = models.CharField(max_length=64)  # Longitud suficiente para almacenar el hash
+    token_notificacion = models.TextField()
     fecha_creacion = models.DateField(auto_now_add=True)
     fecha_modificacion = models.DateField(auto_now=True)
+    id_ciudad = models.ForeignKey(Ciudad, on_delete=models.CASCADE, default=1)
+    id_pais = models.ForeignKey(Pais, on_delete=models.CASCADE, default=1)
     estado = models.IntegerField(choices=[(0, 'Inactivo'), (1, 'Activo'), (3, 'deshabilitado')], default=0)
 
-    #def save(self, *args, **kwargs):
-        # Almacena la contraseña como un hash solo si se está creando un nuevo objeto
-     #   if not self.id_usuario:
-      #      self.contrasena = make_password(self.contrasena)
-       # super().save(*args, **kwargs)
+    def save(self, *args, **kwargs):
+        # Almacena la contraseña como un hash SHA-256 solo si se está creando un nuevo objeto
+        if not self.id_usuario:
+            self.contrasena = self._hash_password(self.contrasena)
+        super().save(*args, **kwargs)
+
+    def _hash_password(self, password):
+        # Utiliza hashlib para calcular el hash SHA-256 de la contraseña
+        sha256 = hashlib.sha256()
+        sha256.update(password.encode('utf-8'))
+        return sha256.hexdigest()
 
     def __str__(self):
         return self.email
@@ -68,6 +116,8 @@ class Publicista(models.Model):
     telefono = models.CharField(max_length=10)
     fecha_creacion = models.DateField()
     fecha_modificacion = models.DateField()
+    id_ciudad = models.ForeignKey(Ciudad, on_delete=models.CASCADE, default=1)
+    id_pais = models.ForeignKey(Pais, on_delete=models.CASCADE, default=1)
     estado = models.IntegerField()
 
     def __str__(self):
@@ -88,22 +138,38 @@ class Empresa(models.Model):
     id_usuario = models.ForeignKey('Usuario', on_delete=models.CASCADE)
     ruc = models.CharField(max_length=13)
     nombre = models.CharField(max_length=30)
-    descripcion = models.CharField(max_length=50)
+    descripcion = models.CharField(max_length=300)
     mail_contacto = models.CharField(max_length=40)
     telefono = models.CharField(max_length=10)
+    id_pais = models.ForeignKey(Pais, on_delete=models.CASCADE, default=1)
     fecha_creacion = models.DateField()
     fecha_modificacion = models.DateField()
-    estado = models.IntegerField()
+    estado = models.ForeignKey('Estado', on_delete=models.CASCADE)
 
     def __str__(self):
         return self.nombre
 
+class EmpresaImages(models.Model):
+    id_images = models.AutoField(primary_key=True)
+    id_empresa = models.ForeignKey('Empresa', on_delete=models.CASCADE)
+    logo = models.ImageField(upload_to=LOGOS_URL, default="")
+    banner = models.ImageField(upload_to=BANNERS_URL, default="")
+    estado = models.IntegerField(default = 1)
+
+    def __str__(self):
+        return str(self.id_empresa)
+
 class Sector(models.Model):
     id_sector = models.AutoField(primary_key=True)
     id_empresa = models.ForeignKey('Empresa', on_delete=models.CASCADE)
+    id_campana = models.ForeignKey('CampanaPublicitaria', on_delete=models.CASCADE)
     nombre = models.CharField(max_length=100)
     fecha_creacion = models.DateField()
     cerco_virtual = models.JSONField()
+    centro = models.JSONField(default=dict)
+    zoom = models.IntegerField()
+    id_ciudad = models.ForeignKey(Ciudad, on_delete=models.CASCADE, default=1)
+    id_pais = models.ForeignKey(Pais, on_delete=models.CASCADE, default=1)
     fecha_modificacion = models.DateField()
     estado = models.IntegerField()
 
@@ -112,15 +178,15 @@ class Sector(models.Model):
 
 class Notificacion(models.Model):
     id_notificacion = models.AutoField(primary_key=True)
-    fecha_creacion = models.DateField()
-    fecha_fin = models.DateField()
-    imagen = models.FileField(null=True, blank=True)
-    frecuencia_envio = models.DateField()
+    fecha_envio = models.DateField()
     id_campana = models.IntegerField()
-    estado = models.IntegerField()
+    ESTADO_NOTIFICACION = [
+        ('leido', 'Leido'),
+        ('no leido', 'No Leido'),
+    ]
+    estado = models.CharField(max_length=20, choices=ESTADO_NOTIFICACION)
     titulo = models.CharField(max_length=20)
     descripcion = models.CharField(max_length=100)
-    fecha_modificacion = models.DateField()
 
     def __str__(self):
         return self.titulo
@@ -129,7 +195,9 @@ class Publicidad(models.Model):
     id_publicidad = models.AutoField(primary_key=True)
     fecha_creacion = models.DateField()
     estado = models.IntegerField()
-    imagen_publicitaria = models.FileField()
+    imagen_publicitaria = models.FileField(upload_to=ADS_URL)
+    id_ciudad = models.ForeignKey(Ciudad, on_delete=models.CASCADE, default=1)
+    id_pais = models.ForeignKey(Pais, on_delete=models.CASCADE, default=1)
     fecha_modificacion = models.DateField()
 
     def __str__(self):
@@ -143,6 +211,8 @@ class Chofer(models.Model):
     apellido = models.CharField(max_length=20)
     fecha_nacimiento = models.DateField()
     sexo = models.IntegerField()
+    id_ciudad = models.ForeignKey(Ciudad, on_delete=models.CASCADE, default=1)
+    id_pais = models.ForeignKey(Pais, on_delete=models.CASCADE, default=1)
     estado = models.IntegerField()
 
     def __str__(self):
@@ -150,15 +220,17 @@ class Chofer(models.Model):
 
 class RecorridoRealizado(models.Model):
     id_recorrido = models.AutoField(primary_key=True)
-    id_chofer = models.ForeignKey('Chofer', on_delete=models.CASCADE)
+    id_usuario = models.ForeignKey('Usuario', on_delete=models.CASCADE, default=1)
     id_campana = models.ForeignKey('CampanaPublicitaria', on_delete=models.CASCADE)
     id_vehiculo = models.ForeignKey('Vehiculo', on_delete=models.CASCADE)
-    hora_inicio = models.DateTimeField()
-    fecha = models.DateField()
-    hora_fin = models.DateTimeField()
-    kilometraje_recorrido = models.IntegerField()
+    fecha_hora_inicio = models.CharField(max_length=50)
+    fecha_hora_fin = models.CharField(max_length=50)
+    kilometraje_recorrido = models.FloatField(default=0.0)
     dinero_recaudado = models.FloatField()
+    id_ciudad = models.ForeignKey(Ciudad, on_delete=models.CASCADE, default=1)
+    id_pais = models.ForeignKey(Pais, on_delete=models.CASCADE, default=1)
     estado = models.IntegerField()
+    ubicaciones = models.JSONField(default=list)
 
     def __str__(self):
         return f"Recorrido #{self.id_recorrido}"
@@ -166,6 +238,7 @@ class RecorridoRealizado(models.Model):
 class MarcasVehiculos(models.Model):
     id_marca = models.AutoField(primary_key=True)
     nombre = models.CharField(max_length=15)
+    estado = models.CharField(default="Activo")
 
     def __str__(self):
         return self.nombre
@@ -174,14 +247,16 @@ class ModelosVehiculos(models.Model):
     id_modelo = models.AutoField(primary_key=True)
     id_marca = models.ForeignKey('MarcasVehiculos', on_delete=models.CASCADE)
     nombre = models.CharField(max_length=30)
+    estado = models.CharField(default="Activo")
 
     def __str__(self):
         return self.nombre
 
 class Vehiculo(models.Model):
-    id_cliente = models.ForeignKey('Cliente', on_delete=models.CASCADE)
+    id_usuario = models.ForeignKey('Usuario', on_delete=models.CASCADE, null=True, blank=True)
+    id_chofer = models.ForeignKey('Chofer', on_delete=models.CASCADE, null=True, blank=True)
+    id_cliente = models.ForeignKey('Cliente', on_delete=models.CASCADE, null=True, blank=True)
     id_vehiculo = models.AutoField(primary_key=True)
-    telefono_conductor = models.IntegerField(null=True, blank=True)
     placa = models.CharField(max_length=7)
     id_marca = models.ForeignKey('MarcasVehiculos', on_delete=models.CASCADE)
     id_modelo = models.ForeignKey('ModelosVehiculos', on_delete=models.CASCADE)
@@ -195,11 +270,11 @@ class Vehiculo(models.Model):
     ]
     categoria_vehiculo = models.CharField(max_length=20, choices=TIPOS_DE_AUTOS)
     color_vehiculo = models.CharField(max_length=20)
-    imagen_izq = models.FileField()
-    imagen_der = models.FileField()
-    imagen_frontal = models.FileField()
-    imagen_trasera = models.FileField()
-    imagen_techo = models.FileField()
+    imagen_izq = models.ImageField(upload_to=MEDIA_URL, default="")
+    imagen_der = models.ImageField(upload_to=MEDIA_URL, default="")
+    imagen_frontal = models.ImageField(upload_to=MEDIA_URL, default="")
+    imagen_trasera = models.ImageField(upload_to=MEDIA_URL, default="")
+    imagen_techo = models.ImageField(upload_to=MEDIA_URL, default="")
     estado = models.IntegerField()
 
     def __str__(self):
@@ -215,6 +290,8 @@ class Cliente(models.Model):
     email = models.CharField(max_length=40)
     sexo = models.IntegerField()
     telefono = models.CharField(max_length=10)
+    id_ciudad = models.ForeignKey(Ciudad, on_delete=models.CASCADE, default=1)
+    id_pais = models.ForeignKey(Pais, on_delete=models.CASCADE, default=1)
     id_empresa = models.ForeignKey('Empresa', on_delete=models.CASCADE, null=True, blank=True)
     id_campana = models.ForeignKey('CampanaPublicitaria', on_delete=models.CASCADE, null=True, blank=True)
     estado = models.IntegerField()
@@ -229,7 +306,7 @@ class VerificacionConductorCampana(models.Model):
     id_campana = models.ForeignKey('CampanaPublicitaria', on_delete=models.CASCADE)
     fecha_registro = models.DateField()
     tipo_verificacion = models.CharField(max_length=20)
-    imagen_evidencia = models.FileField()
+    imagen_evidencia = models.ImageField(upload_to=MEDIA_URL, default="")
     estado = models.IntegerField()
 
     def __str__(self):
@@ -244,35 +321,53 @@ class MovimientoCapital(models.Model):
     fecha_transaccion = models.DateField()
     monto_transaccion = models.FloatField()
     saldo_acumulado = models.FloatField()
+    id_ciudad = models.ForeignKey(Ciudad, on_delete=models.CASCADE, default=1)
+    id_pais = models.ForeignKey(Pais, on_delete=models.CASCADE, default=1)
     estado = models.IntegerField()
 
     def __str__(self):
         return f"Transacción de Capital #{self.id_saldo}"
 
 class IngresoConductorCampana(models.Model):
-    id_cliente = models.ForeignKey('Cliente', on_delete=models.CASCADE)
+    id_usuario = models.ForeignKey('Usuario', on_delete=models.CASCADE, default=1)
     id_campana = models.ForeignKey('CampanaPublicitaria', on_delete=models.CASCADE)
+    id_formulario_registro = models.IntegerField(default=1)
     fecha_registro = models.DateField()
     id_vehiculo = models.ForeignKey('Vehiculo', on_delete=models.CASCADE)
     estado = models.IntegerField()
+    id_ciudad = models.ForeignKey(Ciudad, on_delete=models.CASCADE, default=1)
+    id_pais = models.ForeignKey(Pais, on_delete=models.CASCADE, default=1)
+    documento_QR = models.FileField(upload_to=DOCS_URL, default="")
+    imagen_QR = models.ImageField(upload_to=MEDIA_URL, default="")
 
     def __str__(self):
-        return f"Ingreso Conductor-Campaña #{self.id_cliente}"
+        return f"Ingreso Conductor-Campaña #{self.id_usuario}"
 
 class FormularioRegistroCampana(models.Model):
     id_formulario = models.AutoField(primary_key=True)
-    id_chofer = models.ForeignKey('Chofer', on_delete=models.CASCADE)
-    id_cliente = models.ForeignKey('Cliente', on_delete=models.CASCADE)
+    id_usuario = models.ForeignKey('Usuario', on_delete=models.CASCADE, default=1)
     id_campana = models.ForeignKey('CampanaPublicitaria', on_delete=models.CASCADE)
     telefono_conductor = models.IntegerField()
-    licencia = models.ImageField(upload_to='images/')
-    matricula = models.ImageField(upload_to='images/')
+    licencia = models.FileField(upload_to=DOCS_URL)
+    matricula = models.FileField(upload_to=DOCS_URL)
     numero_cuenta_bancaria = models.CharField(max_length=15)
     cedula = models.CharField(max_length=10)
-    entidad_bancaria = models.IntegerField()
-    tipo_cuenta_bancaria = models.IntegerField()
+    entidad_bancaria = models.CharField()
+    tipo_cuenta_bancaria = models.CharField()
     correo_electronico = models.CharField(max_length=50)
+    id_ciudad = models.ForeignKey(Ciudad, on_delete=models.CASCADE, default=1)
+    id_pais = models.ForeignKey(Pais, on_delete=models.CASCADE, default=1)
+    id_vehiculo = models.ForeignKey(Vehiculo, on_delete=models.CASCADE, default=4)
     fecha_envio = models.DateField()
+    estado_solicitud = models.CharField(default="pendiente")
+    brandeo = models.BooleanField(default=False)
+    carroceria_capo = models.BooleanField(default=False)
+    carroceria_techo = models.BooleanField(default=False)
+    puerta_conductor = models.BooleanField(default=False)
+    puerta_pasajero = models.BooleanField(default=False)
+    puerta_trasera_iz = models.BooleanField(default=False)
+    puerta_trasera_der = models.BooleanField(default=False)
+    puerta_maletero = models.BooleanField(default=False)
 
     def __str__(self):
         return f"Formulario Registro-Campaña #{self.id_formulario}"
@@ -280,6 +375,8 @@ class FormularioRegistroCampana(models.Model):
 class CampanaPublicitaria(models.Model):
     id_campana = models.AutoField(primary_key=True)
     id_empresa = models.ForeignKey('Empresa', on_delete=models.CASCADE)
+    id_ciudad = models.ForeignKey(Ciudad, on_delete=models.CASCADE, default=1)
+    id_pais = models.ForeignKey(Pais, on_delete=models.CASCADE, default=1)
     nombre_campana = models.CharField(max_length=20)
     correo_responsable = models.CharField(max_length=40)
     id_sector = models.IntegerField(null=True)
@@ -299,14 +396,14 @@ class CampanaPublicitaria(models.Model):
         ('panel led', 'Panel LED'),
     ]
     tipo_brandeo = models.CharField(max_length=20, choices=TIPOS_BRANDEOS)
-    taller_brandeo = models.CharField(max_length=30)
-    carroceria_capo = models.BooleanField()
-    puerta_conductor = models.BooleanField()
-    puerta_pasajero = models.BooleanField()
-    puerta_traseratzq = models.BooleanField()
-    puerta_traseraDer = models.BooleanField()
-    carroceria_guantera = models.BooleanField()
-    carroceria_techo = models.BooleanField()
+    id_talleres = models.JSONField(default=list)
+    carroceria_capo = models.FloatField(default=0.0)
+    carroceria_techo = models.FloatField(default=0.0)
+    puerta_conductor = models.FloatField(default=0.0)
+    puerta_pasajero = models.FloatField(default=0.0)
+    puerta_trasera_iz = models.FloatField(default=0.0)
+    puerta_trasera_der = models.FloatField(default=0.0)
+    puerta_maletero = models.FloatField(default=0.0)
     fecha_creacion = models.DateField()
     fecha_modificacion = models.DateField()
     estado = models.IntegerField()
@@ -336,10 +433,12 @@ class TallerXEmpresa(models.Model):
 
 class TallerBrandeo(models.Model):
     id_taller = models.AutoField(primary_key=True)
-    nombre = models.CharField(max_length=30)
-    direccion = models.CharField(max_length=70)
-    referencia = models.CharField(max_length=100)
-    telefono = models.CharField(max_length=10)
+    id_ciudad = models.ForeignKey(Ciudad, on_delete=models.CASCADE, default=1)
+    id_pais = models.ForeignKey(Pais, on_delete=models.CASCADE, default=1)
+    nombre = models.CharField(max_length=50)
+    direccion = models.CharField(max_length=100)
+    referencia = models.CharField(max_length=150)
+    telefono = models.CharField(max_length=15)
     estado = models.IntegerField()
     fecha_creacion = models.DateField()
     fecha_modificacion = models.DateField()

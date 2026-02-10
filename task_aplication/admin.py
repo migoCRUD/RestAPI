@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import (
+from .models import (Estado, EmpresaImages, EntidadBancaria,
+    Pais, Ciudad,
     Usuario, RolUsuario, DetallePermisos, PermisosXRol, Publicista, EmpresaXPublicista,
     Empresa, Sector, Notificacion, Publicidad, Chofer, RecorridoRealizado, MarcasVehiculos,
     ModelosVehiculos, Vehiculo, Cliente, VerificacionConductorCampana, MovimientoCapital,
@@ -9,6 +10,11 @@ from .models import (
 
 
 # Register your models here.
+admin.site.register(Estado)
+admin.site.register(EmpresaImages)
+admin.site.register(EntidadBancaria)
+admin.site.register(Pais)
+admin.site.register(Ciudad)
 admin.site.register(Usuario)
 admin.site.register(RolUsuario)
 admin.site.register(DetallePermisos)

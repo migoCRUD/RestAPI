@@ -6,6 +6,10 @@ router = routers.DefaultRouter()
 #router.register(r"Usuarios",views.aplicationView,'Usuario')
 
 # Registra las vistas para los modelos en el enrutador
+router.register(r'estado', views.EstadoViewSet)
+router.register(r'entidadesbancarias', views.EntidadBancariaViewSet)
+router.register(r'paises', views.PaisViewSet)
+router.register(r'ciudades', views.CiudadViewSet)
 router.register(r'usuarios', views.UsuarioViewSet)
 router.register(r'rolusuarios', views.RolUsuarioViewSet)
 router.register(r'detallepermisos', views.DetallePermisosViewSet)
@@ -13,6 +17,7 @@ router.register(r'permisosxrol', views.PermisosXRolViewSet)
 router.register(r'publicistas', views.PublicistaViewSet)
 router.register(r'empresaxpublicistas', views.EmpresaXPublicistaViewSet)
 router.register(r'empresas', views.EmpresaViewSet)
+router.register(r'empresaimages', views.EmpresaImagesViewSet)
 router.register(r'sectores', views.SectorViewSet)
 router.register(r'notificaciones', views.NotificacionViewSet)
 router.register(r'publicidades', views.PublicidadViewSet)
@@ -39,6 +44,7 @@ urlpatterns=[
     path("Database/", include(router.urls)),
     path('documents/', include_docs_urls(title='Aplication API')),
     path('send_email/', views.SendEmailView.as_view(), name='send_email'),
+    path('send_fcm_notification/', views.SendNotificationView.as_view(), name='send_fcm_notification'),
 
     path('sectores_por_usuario/<int:usuario_id>/', views.SectoresPorUsuarioView.as_view(), name='sectores-por-usuario'),
     path('empresas_list/<int:usuario_id>/', views.EmpresasListView.as_view(), name='empresas-list'),

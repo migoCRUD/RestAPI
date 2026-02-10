@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import os
+import hashlib
+import environ
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,15 +22,71 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-(v%6a73g)^q^2-)da$2(5fygrx8qx84cmel%c_htj%)flu2qq*'
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+env = environ.Env()
+environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
+# Configuración de seguridad
+SECRET_KEY = env('DJANGO_KEY')
+DEBUG = env('DEBUG')
+DB_NAME = env('DB_NAME')
+DB_USER = env('DB_USER')
+DB_PASSWORD = env('DB_PASSWORD')
+DB_HOST = env('DB_HOST')
+DB_PORT = env('DB_PORT')
 
-ALLOWED_HOSTS = ['migoadvs.pythonanywhere.com']
 
+if DEBUG:
+    CORS_ALLOW_ALL_ORIGINS = True
+    ALLOWED_HOSTS = ['*']
+    CORS_ALLOW_HEADERS = ['*']    
+else:
+    CORS_ALLOW_CREDENTIALS = True
+    CORS_ALLOW_ALL_ORIGINS = False
+    CORS_ALLOWED_ORIGINS = [
+        'migoadvs.pythonanywhere.com',
+    ]
+    ALLOWED_HOSTS = [
+        'localhost',
+        '127.0.0.1',
+        'migoadvs.pythonanywhere.com',
+    ]
 
+#autorizacion
+""" 
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ORIGIN_WHITELIST = (
+    'http://localhost:3030',
+    'https://localhost:3030',
+    'http://localhost:4200'
+)
+
+CORS_ORIGIN_REGEX_WHITELIST = (
+    'http://localhost:3030',
+    'https://localhost:3030',
+    'http://localhost:4200'
+)
+ """
+
+CORS_ALLOW_METHODS = (
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+    'DELETE',
+)
+
+CORS_ALLOW_HEADERS = (
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+)
 # Application definition
 
 INSTALLED_APPS = [
@@ -82,14 +140,13 @@ WSGI_APPLICATION = 'RestAPI.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'migoadvs_database',
-        'USER': 'administrador',
-        'PASSWORD': 'P$2wR8k#6q',
-        'HOST': 'migoadvs-3475.postgres.pythonanywhere-services.com',   # Set to your PostgreSQL server's host
-        'PORT': '13475',            # Leave empty for default PostgreSQL port (5432)
+        'NAME': DB_NAME,
+        'USER': DB_USER,
+        'PASSWORD': DB_PASSWORD,
+        'HOST': DB_HOST,   # Set to your PostgreSQL server's host
+        'PORT': DB_PORT,            # Leave empty for default PostgreSQL port (5432)
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -127,8 +184,12 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-STATIC_ROOT = os.path.join(BASE_DIR,'static')
+# Media files
+STATIC_URL = '/static/'
 
+# Media files
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 #print(STATIC_ROOT)
 
 # Default primary key field type
@@ -136,41 +197,8 @@ STATIC_ROOT = os.path.join(BASE_DIR,'static')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-#autorizacion
-CORS_ALLOWED_ORIGINS=[]
 
-CORS_ORIGIN_ALLOW_ALL = True
-CORS_ALLOW_CREDENTIALS = True
-CORS_ORIGIN_WHITELIST = (
-    'http://localhost:3030',
-    'https://localhost:3030',
-    'http://localhost:4200'
-)
 
-CORS_ORIGIN_REGEX_WHITELIST = (
-    'http://localhost:3030',
-    'https://localhost:3030'
-)
-
-CORS_ALLOW_METHODS = (
-    'GET',
-    'OPTIONS',
-    'PATCH',
-    'POST',
-    'PUT',
-)
-
-CORS_ALLOW_HEADERS = (
-    'accept',
-    'accept-encoding',
-    'authorization',
-    'content-type',
-    'dnt',
-    'origin',
-    'user-agent',
-    'x-csrftoken',
-    'x-requested-with',
-)
 
 REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',

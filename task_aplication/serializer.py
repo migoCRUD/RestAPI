@@ -1,18 +1,43 @@
 from rest_framework import serializers
 #from rest_framework_simplejwt.tokens import RefreshToken
 #from django.contrib.auth.hashers import check_password
-from .models import (Usuario, RolUsuario, DetallePermisos, PermisosXRol, Publicista, EmpresaXPublicista,
+from .models import (Estado, EmpresaImages, EntidadBancaria, Pais, Ciudad, Usuario, RolUsuario, DetallePermisos, PermisosXRol, Publicista, EmpresaXPublicista,
 Empresa, Sector, Notificacion, Publicidad, Chofer, RecorridoRealizado, MarcasVehiculos,
 ModelosVehiculos, Vehiculo, Cliente, VerificacionConductorCampana, MovimientoCapital,
 IngresoConductorCampana, FormularioRegistroCampana, CampanaPublicitaria,
 VehiculosAdmisiblesCampana, TallerXEmpresa, TallerBrandeo, Menu, Vista, Opciones)
 
+class NotificationSerializer(serializers.Serializer):
+    registration_token = serializers.CharField()
+    title = serializers.CharField()
+    body = serializers.CharField()
 
 class EmailSerializer(serializers.Serializer):
     subject = serializers.CharField()
     message = serializers.CharField()
+    template = serializers.CharField()
     #from_email = serializers.EmailField()
     recipient_list = serializers.ListField(child=serializers.EmailField())
+
+class EstadoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Estado
+        fields = '__all__'
+
+class EntidadBancariaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EntidadBancaria
+        fields = '__all__'
+
+class PaisSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Pais
+        fields = '__all__'
+
+class CiudadSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Ciudad
+        fields = '__all__'
 
 class UsuarioSerializer(serializers.ModelSerializer):
     class Meta:
@@ -48,6 +73,11 @@ class EmpresaXPublicistaSerializer(serializers.ModelSerializer):
 class EmpresaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Empresa
+        fields = '__all__'
+
+class EmpresaImagesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EmpresaImages
         fields = '__all__'
 
 class SectorSerializer(serializers.ModelSerializer):

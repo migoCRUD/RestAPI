@@ -1,34 +1,101 @@
+import os
 from django.shortcuts import render
 from django.conf import settings
 from django.core.mail import EmailMessage
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializer import EmailSerializer
 from django.template.loader import render_to_string
 #from rest_framework.response import Response
+from django.http import JsonResponse
+import requests
+from google.auth.transport.requests import Request
+from google.oauth2 import service_account
+import google.auth
+import json
+from django.conf import settings
 
 
+GOOGLE_APPLICATION_CREDENTIALS = os.path.join(settings.BASE_DIR, "task_aplication/service-account-file.json")
+SCOPES = ['https://www.googleapis.com/auth/firebase.messaging']
 
 # Create your views here.
 from rest_framework import viewsets
-from .models import (Usuario, RolUsuario, DetallePermisos, PermisosXRol, Publicista, EmpresaXPublicista,
+from .models import (Estado, EmpresaImages, EntidadBancaria, Pais, Ciudad, Usuario, RolUsuario, DetallePermisos, PermisosXRol, Publicista, EmpresaXPublicista,
 Empresa, Sector, Notificacion, Publicidad, Chofer, RecorridoRealizado, MarcasVehiculos,
 ModelosVehiculos, Vehiculo, Cliente, VerificacionConductorCampana, MovimientoCapital,
 IngresoConductorCampana, FormularioRegistroCampana, CampanaPublicitaria,
 VehiculosAdmisiblesCampana, TallerXEmpresa, TallerBrandeo, Menu, Vista, Opciones)
 
-from .serializer import (UsuarioSerializer, RolUsuarioSerializer, DetallePermisosSerializer,
-PermisosXRolSerializer, PublicistaSerializer, EmpresaXPublicistaSerializer, EmpresaSerializer,
+from .serializer import (EstadoSerializer, EntidadBancariaSerializer, PaisSerializer, CiudadSerializer, UsuarioSerializer, RolUsuarioSerializer, DetallePermisosSerializer,
+PermisosXRolSerializer, PublicistaSerializer, EmpresaXPublicistaSerializer, EmpresaSerializer, EmpresaImagesSerializer,
 SectorSerializer, NotificacionSerializer, PublicidadSerializer, ChoferSerializer,
 RecorridoRealizadoSerializer, MarcasVehiculosSerializer, ModelosVehiculosSerializer,
 VehiculoSerializer, ClienteSerializer, VerificacionConductorCampanaSerializer,
 MovimientoCapitalSerializer, IngresoConductorCampanaSerializer,
 FormularioRegistroCampanaSerializer, CampanaPublicitariaSerializer,
 VehiculosAdmisiblesCampanaSerializer, TallerXEmpresaSerializer, TallerBrandeoSerializer,
-MenuSerializer, VistaSerializer, OpcionesSerializer,SectoresSerializer,EmpresasSerializer)
+MenuSerializer, VistaSerializer, OpcionesSerializer,SectoresSerializer,EmpresasSerializer,EmailSerializer,NotificationSerializer)
 
 # Vistas para cada modelo
+
+class SendNotificationView(APIView):
+    def post(self, request):
+        try:
+            serializer = NotificationSerializer(data=request.data)
+            if serializer.is_valid():
+                registration_token = serializer.validated_data['registration_token']
+                title = serializer.validated_data['title']
+                body = serializer.validated_data['body']
+
+                # Get the access token
+                credentials = service_account.Credentials.from_service_account_file(
+                    GOOGLE_APPLICATION_CREDENTIALS, scopes=SCOPES)
+                request = google.auth.transport.requests.Request()
+                credentials.refresh(request)
+                access_token = credentials.token
+
+                # Add your FCM API V1 logic here using the access_token
+                # Use the access_token in the headers of your HTTP requests to the FCM API
+                headers = {
+                    'Authorization': f'Bearer {access_token}',
+                    'Content-Type': 'application/json',
+                }
+
+                # Construct the FCM API request payload
+                payload = {
+                    'message': {
+                        'token': registration_token,
+                        'notification': {
+                            'title': title,
+                            'body': body,
+                        },
+                        'data': {
+                            'titulo': title,
+                            'cuerpo': body
+                        },
+                    },
+                }
+
+                # Make the HTTP request to the FCM API
+                response = requests.post(
+                    'https://fcm.googleapis.com/v1/projects/369555004314/messages:send',
+                    headers=headers,
+                    data=json.dumps(payload),
+                )
+
+                # Handle the response as needed
+                if response.status_code == 200:
+                    print('Notification sent successfully')
+                    return Response({'success': 'Notification sent successfully'}, status=status.HTTP_200_OK)
+                else:
+                    print(f'Failed to send notification. Status code: {response.status_code}, Error: {response.text}')
+                    return Response({'error': 'Failed to send notification'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            else:
+                return Response({'error': 'Invalid data'}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            print(f'An error occurred: {str(e)}')
+            return Response({'error': 'An error occurred'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class SendEmailView(APIView):
     def post(self, request):
@@ -37,28 +104,57 @@ class SendEmailView(APIView):
         if serializer.is_valid():
             message = serializer.validated_data['message']
             subject = serializer.validated_data['subject']
+            template = serializer.validate_data['template']
             from_email = settings.EMAIL_HOST_USER
             recipient_list = serializer.validated_data['recipient_list']
 
-            #code = str(rd.randint(111111, 999999))
-            #message = "El código para recuperar su contraseña es "+code
-            #subject = "Migo Ads - Recuperación de contraseña"
+            if template == 'correo':
+                context = {
+                    'name': subject,
+                    'code': message
+                }
 
-            context = {
-                'name': subject,
-                'code': message
-            }
+                # Render the HTML template
+                html_content = render_to_string(template + '.html', context)
 
-            # Render the HTML template
-            html_content = render_to_string('correo.html', context)
+                email = EmailMessage("Migo Ads - Recuperación de contraseña", html_content, from_email, recipient_list)
+                email.content_subtype = "html"
+                email.send()
 
-            email = EmailMessage("Migo Ads - Recuperación de contraseña", html_content, from_email, recipient_list)
-            email.content_subtype = "html"
-            email.send()
+                return Response({'message': 'Email sent successfully.'}, status=status.HTTP_200_OK)
 
-            return Response({'message': 'Email sent successfully.'}, status=status.HTTP_200_OK)
+            elif template != '':
+                context = { ## las claves del context es lo que se va a inyectar en el html sujeto a cambios dependiendo del template
+                    'subject': subject,
+                    'message': message
+                }
+
+                # Render the HTML template
+                html_content = render_to_string(template + '.html', context)
+
+                email = EmailMessage("Migo Ads - Email de ejemplo", html_content, from_email, recipient_list)
+                email.content_subtype = "html"
+                email.send()
+
+                return Response({'message': 'Email sent successfully.'}, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class EstadoViewSet(viewsets.ModelViewSet):
+    queryset = Estado.objects.all()
+    serializer_class = EstadoSerializer
+
+class EntidadBancariaViewSet(viewsets.ModelViewSet):
+    queryset = EntidadBancaria.objects.all()
+    serializer_class = EntidadBancariaSerializer
+
+class PaisViewSet(viewsets.ModelViewSet):
+    queryset = Pais.objects.all()
+    serializer_class = PaisSerializer
+
+class CiudadViewSet(viewsets.ModelViewSet):
+    queryset = Ciudad.objects.all()
+    serializer_class = CiudadSerializer
 
 class UsuarioViewSet(viewsets.ModelViewSet):
     queryset = Usuario.objects.all()
@@ -87,6 +183,10 @@ class EmpresaXPublicistaViewSet(viewsets.ModelViewSet):
 class EmpresaViewSet(viewsets.ModelViewSet):
     queryset = Empresa.objects.all()
     serializer_class = EmpresaSerializer
+
+class EmpresaImagesViewSet(viewsets.ModelViewSet):
+    queryset = EmpresaImages.objects.all()
+    serializer_class = EmpresaImagesSerializer
 
 class SectorViewSet(viewsets.ModelViewSet):
     queryset = Sector.objects.all()
